@@ -43,6 +43,7 @@ func (d *Debouncer) debounce() {
 				d.callback()
 			}
 		case <-d.stop:
+			d.timer.Stop()
 			return
 		}
 	}
