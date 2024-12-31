@@ -33,6 +33,7 @@ type Debouncer struct {
 	callback func()
 	timer    *time.Ticker
 	stop     chan bool
+	interval time.Duration
 }
 
 func (d *Debouncer) debounce() {
@@ -43,6 +44,7 @@ func (d *Debouncer) debounce() {
 				d.callback()
 			}
 		case <-d.stop:
+			d.timer.Stop()
 			return
 		}
 	}
@@ -60,6 +62,7 @@ func (d *Debouncer) Stop() {
 
 // Start the debouncer
 func (d *Debouncer) Start() {
+	d.timer = time.NewTicker(d.interval)
 	go d.debounce()
 }
 
@@ -69,8 +72,8 @@ func New(interval time.Duration, callback func()) *Debouncer {
 	d := &Debouncer{
 		state:    reset,
 		callback: callback,
-		timer:    time.NewTicker(interval),
 		stop:     make(chan bool),
+		interval: interval,
 	}
 
 	return d
